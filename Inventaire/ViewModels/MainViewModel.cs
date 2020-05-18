@@ -1,14 +1,18 @@
-﻿using BillingManagement.Models;
+﻿using BillingManagement.Business;
+using BillingManagement.Models;
 using BillingManagement.UI.ViewModels.Commands;
 using Inventaire;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BillingManagement.UI.ViewModels
 {
     class MainViewModel : BaseViewModel
     {
+		private BillingManagementContext db;
+
 		private BaseViewModel _vm;
 
 		public BaseViewModel VM
@@ -49,6 +53,7 @@ namespace BillingManagement.UI.ViewModels
 
 		public MainViewModel()
 		{
+			// Commands
 			ChangeViewCommand = new ChangeViewCommand(ChangeView);
 			DisplayInvoiceCommand = new DelegateCommand<Invoice>(DisplayInvoice);
 			DisplayCustomerCommand = new DelegateCommand<Customer>(DisplayCustomer);
@@ -58,11 +63,14 @@ namespace BillingManagement.UI.ViewModels
 
 			ExitCommand = new DelegateCommand<object>(Exit);
 
+			// Database
+			db = new BillingManagementContext();
+			SeedData();
+
 			customerViewModel = new CustomerViewModel();
 			invoiceViewModel = new InvoiceViewModel(customerViewModel.Customers);
 
 			VM = customerViewModel;
-
 		}
 
 		private void ChangeView(string vm)
@@ -118,6 +126,24 @@ namespace BillingManagement.UI.ViewModels
 		private void Exit(object o)
 		{
 			App.Current.Shutdown();
+		}
+
+		private void SeedData()
+		{
+			List<Customer> Customers = new CustomersDataService().GetAll().ToList();
+			List<Invoice> Invoices = new InvoicesDataService(Customers).GetAll().ToList();
+		
+			foreach (Customer c in Customers)
+			{
+				db.Customers.Add(c);
+			}
+
+			foreach (Invoice i in Invoices)
+			{
+				db.Invoices.Add(i);
+			}
+
+			db.SaveChanges();
 		}
 	}
 }

@@ -3,12 +3,13 @@ using BillingManagement.Models;
 using BillingManagement.UI.ViewModels.Commands;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace BillingManagement.UI.ViewModels
 {
     public class CustomerViewModel : BaseViewModel
     {
-        readonly CustomersDataService customersDataService = new CustomersDataService();
+        private BillingManagementContext db;
 
         private ObservableCollection<Customer> customers;
         private Customer selectedCustomer;
@@ -39,14 +40,15 @@ namespace BillingManagement.UI.ViewModels
         public CustomerViewModel()
         {
             DeleteCustomerCommand = new RelayCommand<Customer>(DeleteCustomer, CanDeleteCustomer);
-            
+
+            db = new BillingManagementContext();
 
             InitValues();
         }
 
         private void InitValues()
         {
-            Customers = new ObservableCollection<Customer>(customersDataService.GetAll());
+            Customers = new ObservableCollection<Customer>(db.Customers.ToList().OrderBy(c => c.LastName));
             Debug.WriteLine(Customers.Count);
         }
 
@@ -68,10 +70,5 @@ namespace BillingManagement.UI.ViewModels
             
             return c.Invoices.Count == 0;
         }
-
-
-
-
-
     }
 }

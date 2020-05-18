@@ -10,13 +10,15 @@ namespace BillingManagement.UI.ViewModels
 {
 	class InvoiceViewModel : BaseViewModel
 	{
+		private BillingManagementContext db;
+
 		private Invoice selectedInvoice;
 		private ObservableCollection<Invoice> invoices;
 
 		public InvoiceViewModel(IEnumerable<Customer> customerData)
 		{
-			InvoicesDataService ids = new InvoicesDataService(customerData);
-			Invoices = new ObservableCollection<Invoice>(ids.GetAll().ToList());
+			db = new BillingManagementContext();
+			Invoices = new ObservableCollection<Invoice>(db.Invoices.ToList());
 		}
 
 		public Invoice SelectedInvoice
@@ -35,6 +37,5 @@ namespace BillingManagement.UI.ViewModels
 				OnPropertyChanged();
 			}
 		}
-
 	}
 }
