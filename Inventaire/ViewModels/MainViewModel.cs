@@ -4,8 +4,10 @@ using BillingManagement.UI.ViewModels.Commands;
 using Inventaire;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace BillingManagement.UI.ViewModels
 {
@@ -50,6 +52,8 @@ namespace BillingManagement.UI.ViewModels
 
 		public DelegateCommand<object> ExitCommand { get; private set; }
 
+		public DelegateCommand<object> SearchCommand { get; private set; }
+
 
 		public MainViewModel()
 		{
@@ -62,6 +66,8 @@ namespace BillingManagement.UI.ViewModels
 			AddInvoiceToCustomerCommand = new DelegateCommand<Customer>(AddInvoiceToCustomer);
 
 			ExitCommand = new DelegateCommand<object>(Exit);
+
+			SearchCommand = new DelegateCommand<object>(Search, CanSearch);
 
 			// Database
 			db = new BillingManagementContext();
@@ -126,6 +132,28 @@ namespace BillingManagement.UI.ViewModels
 		private void Exit(object o)
 		{
 			App.Current.Shutdown();
+		}
+
+		private void Search(object o)
+		{
+			if (SearchCriteria == null || SearchCriteria.Length == 0)
+			{
+				customerViewModel.SetCustomers(new ObservableCollection<Customer>(db.Customers.ToList().OrderBy(c => c.LastName)));
+			}
+			else
+			{
+				customerViewModel.SetCustomers(new ObservableCollection<Customer>(db.Customers.Where(c => c.Name.ToUpper().StartsWith(SearchCriteria.ToUpper()) || c.LastName.ToUpper().StartsWith(SearchCriteria.ToUpper())).ToList().OrderBy(c => c.LastName)));
+			}
+		}
+
+		private bool CanSearch(object o)
+		{
+			if (VM == customerViewModel)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		private void SeedData()

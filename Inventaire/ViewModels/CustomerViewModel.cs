@@ -70,5 +70,10 @@ namespace BillingManagement.UI.ViewModels
             
             return c.Invoices.Count == 0;
         }
+
+        public void SetCustomers(ObservableCollection<Customer> customers)
+        {
+            Customers = customers;
+        }
     }
 }
