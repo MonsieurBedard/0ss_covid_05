@@ -1,5 +1,6 @@
 ﻿using BillingManagement.Models;
 using BillingManagement.UI.ViewModels.Commands;
+using Inventaire;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -43,6 +44,8 @@ namespace BillingManagement.UI.ViewModels
 
 		public DelegateCommand<Customer> AddInvoiceToCustomerCommand { get; private set; }
 
+		public DelegateCommand<object> ExitCommand { get; private set; }
+
 
 		public MainViewModel()
 		{
@@ -52,6 +55,8 @@ namespace BillingManagement.UI.ViewModels
 
 			AddNewItemCommand = new DelegateCommand<object>(AddNewItem, CanAddNewItem);
 			AddInvoiceToCustomerCommand = new DelegateCommand<Customer>(AddInvoiceToCustomer);
+
+			ExitCommand = new DelegateCommand<object>(Exit);
 
 			customerViewModel = new CustomerViewModel();
 			invoiceViewModel = new InvoiceViewModel(customerViewModel.Customers);
@@ -110,5 +115,9 @@ namespace BillingManagement.UI.ViewModels
 			return result;
 		}
 
+		private void Exit(object o)
+		{
+			App.Current.Shutdown();
+		}
 	}
 }
